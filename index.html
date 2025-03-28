@@ -1,0 +1,337 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <script type="application/javascript">
+    
+        const backend_url ="https://chat.nrywhite.lat";
+
+        const div1 = document.createElement("div");
+        document.body.appendChild(div1);
+
+        const bienvenida = document.createElement("h1");
+        bienvenida.innerText = "Secret Chat 🤫";
+        div1.appendChild(bienvenida);
+
+        const div2 = document.createElement("div");
+        document.body.appendChild(div2);
+
+        const div3 = document.createElement("div");
+        document.body.appendChild(div3);
+
+        function applyStyles() {
+            document.body.style.margin = "0";
+            document.body.style.padding = "0";
+            document.body.style.fontFamily = "Arial, sans-serif";
+            document.body.style.backgroundImage = "url('/assets/back.gif')"
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+            
+            if (!document.querySelector("#overlay")) {
+                const overlay = document.createElement("div");
+                overlay.id = "overlay";
+                overlay.style.position = "absolute";
+                overlay.style.top = "0";
+                overlay.style.left = "0";
+                overlay.style.right = "0";
+                overlay.style.bottom = "0";
+                overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                overlay.style.zIndex = "-1";
+                document.body.appendChild(overlay);
+            }
+
+            div1.style.textAlign = "center";
+            div1.style.padding = "20px";
+
+            bienvenida.style.fontSize = "2rem";
+            bienvenida.style.color = "RGB(156, 204, 156)";
+
+            div2.style.padding = "20px";
+            div2.style.maxWidth = "800px";
+            div2.style.margin = "0 auto";
+            div2.style.height = "600px";
+            div2.style.overflowY = "scroll";
+            div2.style.display = "flex";
+            div2.style.flexDirection= "column";
+
+            div3.style.padding = "20px";
+            div3.style.maxWidth = "800px";
+            div3.style.margin = "0 auto";
+
+            if (!document.querySelector("#message")){
+                const message = document.createElement("input");
+                message.id = 'message';
+                message.type = "text";
+                message.placeholder = "Ingresa tu mensaje";
+                message.style.width = "100%";
+                message.style.padding = "10px";
+                message.style.fontSize = "1rem";
+                message.style.border = "1px solid #ccc";
+                message.style.borderRadius = "30px";
+                message.maxLength = 140;
+                div3.appendChild(message);
+
+                message.addEventListener('input', function(){
+                    if (message.value.length >= 140){
+                        alert("NO puedes colocar mas de 140 caracteres");
+                        message.value = message.value.slice(0,140);
+                }  
+                });
+            };
+
+            if (!document.querySelector("#user")){
+                const user = document.createElement("input");
+                user.id = "user";
+                user.type = 'text';
+                user.placeholder= "Ingresa el usuario";
+                user.style.width = "10%";
+                user.style.padding = "10px";
+                user.style.fontSize = "1rem";
+                user.style.border = "1px solid #ccc";
+                user.style.borderRadius = "50px";
+                div1.appendChild(user);
+            };
+
+            if (!document.querySelector("#send")){
+                const send = document.createElement("button");
+                send.id = "send";
+                send.textContent = "send";
+                send.style.width = "10%";
+                send.style.borderRadius= "50px";
+                send.style.border = "1px solid #ccc";
+                send.style.backgroundColor = "RGB(14, 107, 14)"
+                send.style.height = '40px';
+                div3.appendChild(send);
+            };
+
+            
+
+            div3.style.display = "flex";
+            div3.style.alignItems = "center";
+            div3.style.justifyContent = "space-between";
+
+
+            if (window.innerWidth <= 768) {
+                bienvenida.style.fontSize = "1.5rem";  
+                div2.style.padding = "10px";
+            } else {
+                bienvenida.style.fontSize = "2.5rem"; 
+                div2.style.padding = "20px";
+            }
+        }
+
+        async function getChats() {
+            try {
+                const respuestas = await fetch(backend_url + "/chats", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!respuestas.ok) { 
+                    alert("Error en la petición HTTP");
+                    throw new Error("Error en la petición HTTP");
+                }
+
+                const datos = await respuestas.json();
+
+                let chats = document.querySelector("ul");
+                if (!chats) {
+                    chats = document.createElement("ul");
+                    div2.appendChild(chats);
+                }
+
+                chats.innerHTML = "";
+
+                datos.forEach(element => {
+                    const chat = document.createElement("li");
+                    const { username, message } = element;
+
+                    const usernameElement = document.createElement("span");
+                    usernameElement.innerText = `${username}:`;
+
+                    const messageElement = document.createElement("span");
+                    messageElement.innerText = message;
+
+                    let bubble = document.createElement("div");
+                    bubble.style.borderRadius = "20px";
+                    bubble.style.padding = "10px";    
+                    bubble.style.maxWidth = "70%";     
+                    bubble.style.marginBottom = "10px"; 
+                    bubble.style.wordWrap = "break-word"; 
+                    bubble.style.display = "inline-block";  
+                    bubble.style.position = "relative"; 
+
+                    if (username === user.value) {
+                        bubble.style.textAlign = "right"; 
+                        bubble.style.backgroundColor = "RGB(5, 109, 99)";
+                        bubble.style.marginLeft = "auto";
+                    } else {
+                        bubble.style.textAlign = "left";  
+                        bubble.style.backgroundColor = "RGB(173, 180, 180)";
+                        bubble.style.marginRight = "auto";
+                    }
+
+                    bubble.appendChild(usernameElement);
+                    bubble.appendChild(messageElement);
+
+                    chats.appendChild(bubble);
+                });
+            } catch (error) {
+                console.log("Error en la petición: ", error);
+            }
+        }
+
+        async function postChat() {
+            try {
+                const respuestas = await fetch(backend_url + "/chats", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ username: user.value, message: message.value })
+                });
+
+                if (!respuestas.ok) {
+                    alert("Error en la petición HTTP");
+                    throw new Error("Error en la petición HTTP");
+                }
+            } catch (error) {
+                console.log("Error en la petición:", error);
+            }
+        }
+
+        function refresh() {
+            const scrollPosition = div2.scrollTop;
+            getChats();
+            div2.scrollTop = scrollPosition;
+        }
+
+        async function verifyChat() {
+            if (message.value.trim() === "") {
+                alert("Mensaje vacío");
+                return;
+            }
+
+            await postChat();
+            await refresh();
+            message.value = "";  
+        }
+
+        function applyStyles() {
+            document.body.style.margin = "0";
+            document.body.style.padding = "0";
+            document.body.style.fontFamily = "Arial, sans-serif";
+            document.body.style.backgroundImage = "url('/assets/back.gif')";
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+
+            if (!document.querySelector("#overlay")) {
+                const overlay = document.createElement("div");
+                overlay.id = "overlay";
+                overlay.style.position = "absolute";
+                overlay.style.top = "0";
+                overlay.style.left = "0";
+                overlay.style.right = "0";
+                overlay.style.bottom = "0";
+                overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+                overlay.style.zIndex = "-1";
+                document.body.appendChild(overlay);
+            }
+
+            div1.style.textAlign = "center";
+            div1.style.padding = "20px";
+
+            bienvenida.style.fontSize = "2rem";
+            bienvenida.style.color = "RGB(156, 204, 156)";
+
+            div2.style.padding = "20px";
+            div2.style.maxWidth = "800px";
+            div2.style.margin = "0 auto";
+            div2.style.height = "600px";
+            div2.style.overflowY = "scroll";
+            div2.style.display = "flex";
+            div2.style.flexDirection = "column";
+
+            div3.style.padding = "20px";
+            div3.style.maxWidth = "800px";
+            div3.style.margin = "0 auto";
+
+            if (!document.querySelector("#message")) {
+                const message = document.createElement("input");
+                message.id = 'message';
+                message.type = "text";
+                message.placeholder = "Ingresa tu mensaje";
+                message.style.width = "100%";
+                message.style.padding = "10px";
+                message.style.fontSize = "1rem";
+                message.style.border = "1px solid #ccc";
+                message.style.borderRadius = "30px";
+                message.maxLength = 140;
+                div3.appendChild(message);
+
+                message.addEventListener('input', function () {
+                    if (message.value.length >= 140) {
+                        alert("NO puedes colocar más de 140 caracteres");
+                        message.value = message.value.slice(0, 140);
+                    }
+                });
+            }
+
+            if (!document.querySelector("#user")) {
+                const user = document.createElement("input");
+                user.id = "user";
+                user.type = 'text';
+                user.placeholder = "Ingresa el usuario";
+                user.style.width = "10%";
+                user.style.padding = "10px";
+                user.style.fontSize = "1rem";
+                user.style.border = "1px solid #ccc";
+                user.style.borderRadius = "50px";
+                div1.appendChild(user);
+            }
+
+            if (!document.querySelector("#send")) {
+                const send = document.createElement("button");
+                send.id = "send";
+                send.textContent = "Send";
+                send.style.width = "10%";
+                send.style.borderRadius = "50px";
+                send.style.border = "1px solid #ccc";
+                send.style.backgroundColor = "RGB(14, 107, 14)";
+                send.style.height = '40px';
+                div3.appendChild(send);
+            }
+
+            div3.style.display = "flex";
+            div3.style.alignItems = "center";
+            div3.style.justifyContent = "space-between";
+
+            if (window.innerWidth <= 768) {
+                bienvenida.style.fontSize = "1.5rem";
+                div2.style.padding = "10px";
+            } else {
+                bienvenida.style.fontSize = "2.5rem";
+                div2.style.padding = "20px";
+            }
+
+            send.addEventListener("click", verifyChat);
+            document.addEventListener("keyup", function (event) {
+                if (event.key === "Enter") {
+                    verifyChat();
+                }
+            });
+        }
+
+        window.onload = function () {
+            applyStyles();
+            setInterval(refresh, 7000);
+        };
+
+        window.onresize = applyStyles;
+        
+    </script>
+  </body>   
+</html>
+
