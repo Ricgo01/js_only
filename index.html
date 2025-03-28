@@ -4,7 +4,7 @@
   <body>
     <script type="application/javascript">
     
-        const backend_url ="https://chat.nrywhite.lat";
+        const backend_url = "https://chat.nrywhite.lat";
 
         const div1 = document.createElement("div");
         document.body.appendChild(div1);
@@ -18,108 +18,6 @@
 
         const div3 = document.createElement("div");
         document.body.appendChild(div3);
-
-        function applyStyles() {
-            document.body.style.margin = "0";
-            document.body.style.padding = "0";
-            document.body.style.fontFamily = "Arial, sans-serif";
-            document.body.style.backgroundImage = "url('assets/back.gif')";
-            document.body.style.backgroundSize = "cover";
-            document.body.style.backgroundPosition = "center";
-            document.body.style.backgroundRepeat = "no-repeat";
-            
-            if (!document.querySelector("#overlay")) {
-                const overlay = document.createElement("div");
-                overlay.id = "overlay";
-                overlay.style.position = "absolute";
-                overlay.style.top = "0";
-                overlay.style.left = "0";
-                overlay.style.right = "0";
-                overlay.style.bottom = "0";
-                overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-                overlay.style.zIndex = "-1";
-                document.body.appendChild(overlay);
-            }
-
-            div1.style.textAlign = "center";
-            div1.style.padding = "20px";
-
-            bienvenida.style.fontSize = "2rem";
-            bienvenida.style.color = "RGB(156, 204, 156)";
-
-            div2.style.padding = "20px";
-            div2.style.maxWidth = "800px";
-            div2.style.margin = "0 auto";
-            div2.style.height = "600px";
-            div2.style.overflowY = "scroll";
-            div2.style.display = "flex";
-            div2.style.flexDirection= "column";
-
-            div3.style.padding = "20px";
-            div3.style.maxWidth = "800px";
-            div3.style.margin = "0 auto";
-
-            if (!document.querySelector("#message")){
-                const message = document.createElement("input");
-                message.id = 'message';
-                message.type = "text";
-                message.placeholder = "Ingresa tu mensaje";
-                message.style.width = "100%";
-                message.style.padding = "10px";
-                message.style.fontSize = "1rem";
-                message.style.border = "1px solid #ccc";
-                message.style.borderRadius = "30px";
-                message.maxLength = 140;
-                div3.appendChild(message);
-
-                message.addEventListener('input', function(){
-                    if (message.value.length >= 140){
-                        alert("NO puedes colocar mas de 140 caracteres");
-                        message.value = message.value.slice(0,140);
-                }  
-                });
-            };
-
-            if (!document.querySelector("#user")){
-                const user = document.createElement("input");
-                user.id = "user";
-                user.type = 'text';
-                user.placeholder= "Ingresa el usuario";
-                user.style.width = "10%";
-                user.style.padding = "10px";
-                user.style.fontSize = "1rem";
-                user.style.border = "1px solid #ccc";
-                user.style.borderRadius = "50px";
-                div1.appendChild(user);
-            };
-
-            if (!document.querySelector("#send")){
-                const send = document.createElement("button");
-                send.id = "send";
-                send.textContent = "send";
-                send.style.width = "10%";
-                send.style.borderRadius= "50px";
-                send.style.border = "1px solid #ccc";
-                send.style.backgroundColor = "RGB(14, 107, 14)"
-                send.style.height = '40px';
-                div3.appendChild(send);
-            };
-
-            
-
-            div3.style.display = "flex";
-            div3.style.alignItems = "center";
-            div3.style.justifyContent = "space-between";
-
-
-            if (window.innerWidth <= 768) {
-                bienvenida.style.fontSize = "1.5rem";  
-                div2.style.padding = "10px";
-            } else {
-                bienvenida.style.fontSize = "2.5rem"; 
-                div2.style.padding = "20px";
-            }
-        }
 
         async function getChats() {
             try {
@@ -146,11 +44,10 @@
                 chats.innerHTML = "";
 
                 datos.forEach(element => {
-                    const chat = document.createElement("li");
                     const { username, message } = element;
 
                     const usernameElement = document.createElement("span");
-                    usernameElement.innerText = `${username}:`;
+                    usernameElement.innerText = `${username}: `;
 
                     const messageElement = document.createElement("span");
                     messageElement.innerText = message;
@@ -161,10 +58,10 @@
                     bubble.style.maxWidth = "70%";     
                     bubble.style.marginBottom = "10px"; 
                     bubble.style.wordWrap = "break-word"; 
-                    bubble.style.display = "inline-block";  
+                    bubble.style.display = "block";  
                     bubble.style.position = "relative"; 
 
-                    if (username === user.value) {
+                    if (username === document.getElementById("user")?.value) {
                         bubble.style.textAlign = "right"; 
                         bubble.style.backgroundColor = "RGB(5, 109, 99)";
                         bubble.style.marginLeft = "auto";
@@ -176,7 +73,6 @@
 
                     bubble.appendChild(usernameElement);
                     bubble.appendChild(messageElement);
-
                     chats.appendChild(bubble);
                 });
             } catch (error) {
@@ -191,7 +87,7 @@
                     headers: {
                         "Content-Type": "application/json"
                     },
-                    body: JSON.stringify({ username: user.value, message: message.value })
+                    body: JSON.stringify({ username: document.getElementById("user")?.value, message: document.getElementById("message")?.value })
                 });
 
                 if (!respuestas.ok) {
@@ -210,14 +106,14 @@
         }
 
         async function verifyChat() {
-            if (message.value.trim() === "") {
+            const messageInput = document.getElementById("message");
+            if (messageInput.value.trim() === "") {
                 alert("Mensaje vacío");
                 return;
             }
-
             await postChat();
             await refresh();
-            message.value = "";  
+            messageInput.value = "";  
         }
 
         function applyStyles() {
@@ -244,10 +140,9 @@
             div1.style.textAlign = "center";
             div1.style.padding = "20px";
 
-            bienvenida.style.fontSize = "2rem";
-            bienvenida.style.color = "RGB(156, 204, 156)";
-
-            div2.style.padding = "20px";
+            bienvenida.style.fontSize = window.innerWidth <= 768 ? "1.5rem" : "2.5rem";
+        
+            div2.style.padding = window.innerWidth <= 768 ? "10px" : "20px";
             div2.style.maxWidth = "800px";
             div2.style.margin = "0 auto";
             div2.style.height = "600px";
@@ -258,6 +153,9 @@
             div3.style.padding = "20px";
             div3.style.maxWidth = "800px";
             div3.style.margin = "0 auto";
+            div3.style.display = "flex";
+            div3.style.alignItems = "center";
+            div3.style.justifyContent = "space-between";
 
             if (!document.querySelector("#message")) {
                 const message = document.createElement("input");
@@ -305,25 +203,78 @@
                 div3.appendChild(send);
             }
 
-            div3.style.display = "flex";
-            div3.style.alignItems = "center";
-            div3.style.justifyContent = "space-between";
-
-            if (window.innerWidth <= 768) {
-                bienvenida.style.fontSize = "1.5rem";
-                div2.style.padding = "10px";
-            } else {
-                bienvenida.style.fontSize = "2.5rem";
-                div2.style.padding = "20px";
-            }
-
-            send.addEventListener("click", verifyChat);
+            const send = document.getElementById("send");
+            send.addEventListener("click", () => {
+                send.style.transform = "scale(0.9)";
+                setTimeout(() => {
+                    send.style.transform = "scale(1)";
+                }, 200);
+                verifyChat();
+            });
             document.addEventListener("keyup", function (event) {
                 if (event.key === "Enter") {
                     verifyChat();
                 }
             });
+
+            if (localStorage.getItem('darkMode') === 'true') {
+                applyDarkMode();
+                toggleButton.textContent = 'Modo Claro';
+            } else {
+                applyLightMode();
+                toggleButton.textContent = 'Modo Oscuro';
+            }
         }
+
+        function applyDarkMode() {
+            bienvenida.style.color = "#8bc34a";
+
+            const userInput = document.getElementById("user");
+            if (userInput) {
+                userInput.style.backgroundColor = "#424242";
+                userInput.style.color = "#e0e0e0";
+                userInput.style.border = "1px solid #616161";
+            }
+
+            const messageInput = document.getElementById("message");
+            if (messageInput) {
+                messageInput.style.backgroundColor = "#424242";
+                messageInput.style.color = "#e0e0e0";
+                messageInput.style.border = "1px solid #616161";
+            }
+        }
+
+        function applyLightMode() {
+            bienvenida.style.color = "RGB(156, 204, 156)";
+            const userInput = document.getElementById("user");
+            if (userInput) {
+                userInput.style.backgroundColor = "";
+                userInput.style.color = "";
+                userInput.style.border = "";
+            }
+            const messageInput = document.getElementById("message");
+            if (messageInput) {
+                messageInput.style.backgroundColor = "";
+                messageInput.style.color = "";
+                messageInput.style.border = "";
+            }
+        }
+
+        const toggleButton = document.createElement('button');
+        toggleButton.textContent = 'Modo Oscuro';
+        document.body.appendChild(toggleButton);
+
+        toggleButton.addEventListener('click', () => {
+            if (localStorage.getItem('darkMode') === 'true') {
+                localStorage.setItem('darkMode', 'false');
+                toggleButton.textContent = 'Modo Oscuro';
+                applyLightMode();
+            } else {
+                localStorage.setItem('darkMode', 'true');
+                toggleButton.textContent = 'Modo Claro';
+                applyDarkMode();
+            }
+        });
 
         window.onload = function () {
             applyStyles();
@@ -335,4 +286,3 @@
     </script>
   </body>   
 </html>
-
