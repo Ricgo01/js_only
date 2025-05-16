@@ -1,5 +1,7 @@
 # Secret Chat - Aplicación de Chat Web
 
+![Vista previa de la aplicación](assets/image.png)
+
 ## Tecnologías Utilizadas
 - HTML5
 - JavaScript Vanilla
@@ -25,10 +27,14 @@ Debido a posibles problemas de conectividad con el servidor backend, se ha imple
 2. Los usuarios puedan ver cómo funciona la interfaz aunque el servidor no esté disponible.
 3. Se muestren ejemplos de los diferentes tipos de contenido (texto e imágenes) que la aplicación puede manejar.
 
+> ⚠️ **Advertencia**: La aplicación intenta conectarse primero al servidor antes de mostrar los datos dummy, por lo que puede haber un retraso de algunos segundos mientras espera la respuesta del API. Si el servidor no responde, después de este tiempo de espera se mostrarán automáticamente los datos dummy.
+
 La función `getDummyChats()` proporciona un conjunto de mensajes de ejemplo que se utilizan automáticamente cuando:
 - Ocurre un error en la petición HTTP al servidor
 - El servidor responde con un código de error
 - Se produce una excepción durante la comunicación con el backend
+
+**Advertencia:** Los datos dummy pueden tardar unos segundos en cargarse.
 
 ## Uso
 1. Abrir el archivo `index.html` en un navegador web
