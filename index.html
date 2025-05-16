@@ -19,6 +19,16 @@
         const div3 = document.createElement("div");
         document.body.appendChild(div3);
 
+        function getDummyChats() {
+        return [
+            { username: "system", message: "Prueba de la dummy data" },
+            { username: "alice", message: "Coloca system en la parte superior para que se vea como si fuera un mensaje que enviaste" },
+            { username: "bob", message: "Prueba de imagenes" },
+            { username: "alice", message: "https://www.illumination.com/wp-content/uploads/2019/11/Pets_Pickles.png"},
+            { username: "system", message: "Estos datos se despliegan cuando no se puede hacer request al api." }
+        ];
+    }
+
         async function getChats() {
             try {
                 const respuestas = await fetch(backend_url + "/chats", {
@@ -29,7 +39,9 @@
                 });
 
                 if (!respuestas.ok) { 
-                    alert("Error en la petición HTTP");
+                    alert("Error en la petición HTTP, se usara la dummy data");
+                    const dummyData = getDummyChats();
+                    displayChats(dummyData);
                     throw new Error("Error en la petición HTTP");
                 }
 
@@ -49,8 +61,22 @@
                     const usernameElement = document.createElement("span");
                     usernameElement.innerText = `${username}: `;
 
-                    const messageElement = document.createElement("span");
-                    messageElement.innerText = message;
+                    let messageElement;
+
+                    if (message.match(/\.(jpeg|jpg|gif|png)$/) !== null) {
+                        messageElement = document.createElement("img");
+                        messageElement.src = message;
+                        messageElement.style.maxWidth = "100%";
+                        messageElement.style.borderRadius = "10px";
+                        messageElement.onerror = function() {
+                            const fallbackText = document.createElement("span");
+                            fallbackText.innerText = message;
+                            this.parentNode.replaceChild(fallbackText, this);
+                        };
+                    } else {
+                        messageElement = document.createElement("span");
+                        messageElement.innerText = message;
+                    }
 
                     let bubble = document.createElement("div");
                     bubble.style.borderRadius = "20px";
@@ -77,6 +103,61 @@
                 });
             } catch (error) {
                 console.log("Error en la petición: ", error);
+                const dummyData = getDummyChats();
+        
+                let chats = document.querySelector("ul");
+                if (!chats) {
+                    chats = document.createElement("ul");
+                    div2.appendChild(chats);
+                }
+                
+                chats.innerHTML = "";
+                dummyData.forEach(element => {
+                    const {username, message} = element;
+
+                    const usernameElement = document.createElement("span");
+                    usernameElement.innerText = `${username}: `;
+
+                    let messageElement;
+
+                    if (message.match(/\.(jpeg|jpg|gif|png)$/) !== null) {
+                        messageElement = document.createElement("img");
+                        messageElement.src = message;
+                        messageElement.style.maxWidth = "100%";
+                        messageElement.style.borderRadius = "10px";
+                        messageElement.onerror = function() {
+                            const fallbackText = document.createElement("span");
+                            fallbackText.innerText = message;
+                            this.parentNode.replaceChild(fallbackText, this);
+                        };
+                    } else {
+                        messageElement = document.createElement("span");
+                        messageElement.innerText = message;
+                    }
+
+                    let bubble = document.createElement("div");
+                    bubble.style.borderRadius = "20px";
+                    bubble.style.padding = "10px";    
+                    bubble.style.maxWidth = "70%";     
+                    bubble.style.marginBottom = "10px"; 
+                    bubble.style.wordWrap = "break-word"; 
+                    bubble.style.display = "block";  
+                    bubble.style.position = "relative"; 
+
+                    if (username === document.getElementById("user")?.value) {
+                        bubble.style.textAlign = "right"; 
+                        bubble.style.backgroundColor = "RGB(5, 109, 99)";
+                        bubble.style.marginLeft = "auto";
+                    } else {
+                        bubble.style.textAlign = "left";  
+                        bubble.style.backgroundColor = "RGB(173, 180, 180)";
+                        bubble.style.marginRight = "auto";
+                    }
+
+                    bubble.appendChild(usernameElement);
+                    bubble.appendChild(messageElement);
+                    chats.appendChild(bubble);
+                });
             }
         }
 
@@ -120,22 +201,9 @@
             document.body.style.margin = "0";
             document.body.style.padding = "0";
             document.body.style.fontFamily = "Arial, sans-serif";
-            document.body.style.backgroundImage = "url('/assets/back.gif')";
+            document.body.style.backgroundImage = "url('assets/back.gif')";
             document.body.style.backgroundSize = "cover";
             document.body.style.backgroundPosition = "center";
-
-            if (!document.querySelector("#overlay")) {
-                const overlay = document.createElement("div");
-                overlay.id = "overlay";
-                overlay.style.position = "absolute";
-                overlay.style.top = "0";
-                overlay.style.left = "0";
-                overlay.style.right = "0";
-                overlay.style.bottom = "0";
-                overlay.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
-                overlay.style.zIndex = "-1";
-                document.body.appendChild(overlay);
-            }
 
             div1.style.textAlign = "center";
             div1.style.padding = "20px";
@@ -200,6 +268,16 @@
                 send.style.border = "1px solid #ccc";
                 send.style.backgroundColor = "RGB(14, 107, 14)";
                 send.style.height = '40px';
+                send.style.transition = 'background-color 0.3s, transform 0.2s';
+                send.addEventListener('mouseover', () => {
+                    send.style.backgroundColor = 'RGB(20, 150, 20)';
+                    send.style.transform = 'scale(1.05)';
+                });
+
+                send.addEventListener('mouseout', () => {
+                    send.style.backgroundColor = 'RGB(14, 107, 14)';
+                    send.style.transform = 'scale(1)';
+                });
                 div3.appendChild(send);
             }
 
